@@ -1,0 +1,102 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+  <f:block>
+    <p style="color:red">
+      ${%MavenWarning}
+    </p>
+  </f:block>
+
+  <j:invokeStatic var="isMavenBuilder" className="hudson.plugins.sonar.SonarPublisher" method="isMavenBuilder">
+    <j:arg value="${it}" type="hudson.model.AbstractProject"/>
+  </j:invokeStatic>
+
+  <!-- SonarQube Installation -->
+  <j:set var="sonars" value="${descriptor.installations}"/>
+  <j:if test="${empty(sonars)}">
+    <!-- no SonarQube installation is configured, so warn the user now -->
+    <f:entry title="${%SonarInstallation}">
+      <div class="error">${%SonarInstallation.error(rootURL)}</div>
+    </f:entry>
+  </j:if>
+  <j:if test="${sonars.size() gt 1}">
+    <!-- choise not necessary if there's no choice -->
+    <f:entry title="${%SonarInstallation}: " help="/plugin/sonar/help-sonar-installation.html">
+      <select class="setting-input" name="sonar.installationName">
+        <j:forEach var="inst" items="${sonars}">
+          <f:option value="${inst.name}" selected="${inst.name==instance.installation.name}">${inst.name}
+          </f:option>
+        </j:forEach>
+      </select>
+    </f:entry>
+  </j:if>
+
+  <f:entry title="${%ForgeProjectId}" description="${%ForgeProjectIdDescr}">
+    <f:textbox name="sonar.forgeProjectId" value="${instance.getForgeProjectId()}"/>
+  </f:entry>
+
+  <f:advanced>
+    <f:entry title="${%Branch}" description="${%BranchDescr}" help="/plugin/sonar/help-branch.html">
+      <f:textbox name="sonar.branch" value="${instance.getBranch()}"/>
+    </f:entry>
+
+    <j:set var="jdks" value="${app.JDKs}" />
+    <f:entry title="JDK" description="${%JDKDesc}" help="/plugin/sonar/help-sonar-jdk.html">
+      <select class="setting-input validated" name="sonar.jdk" checkUrl="'${rootURL}/defaultJDKCheck?value='+this.value">
+        <option value="">${%InheritFromJob}</option>
+        <j:forEach var="inst" items="${jdks}">
+          <f:option selected="${inst.name==instance.getJdkName()}" value="${inst.name}">${inst.name}</f:option>
+        </j:forEach>
+      </select>
+    </f:entry>
+
+    <j:if test="${!isMavenBuilder}">
+      <!-- Maven version -->
+      <f:entry title="${%MavenVersion}">
+        <select class="setting-input" name="sonar.mavenInstallationName">
+          <option value="">${%InheritFromJob}</option>
+          <j:forEach var="inst" items="${descriptor.mavenInstallations}">
+            <f:option selected="${inst.name==instance.getMavenInstallationName()}" value="${inst.name}">
+              ${inst.name}
+            </f:option>
+          </j:forEach>
+        </select>
+      </f:entry>
+      <!-- Root POM -->
+      <f:entry title="${%RootPom}" description="${%RootPomDescr}"
+               help="/plugin/maven-plugin/root-pom.html">
+        <f:textbox name="sonar.rootPom" value="${instance.getRootPom()}"/>
+      </f:entry>
+
+      <f:entry field="usePrivateRepository" title="${%Use private Maven repository}" help="/plugin/maven-plugin/private-repository.html">
+        <f:checkbox checked="${it.usesPrivateRepository()}" />
+      </f:entry>
+
+      <f:dropdownDescriptorSelector title="${%Settings file}" field="settings" descriptors="${descriptor.settingsProviders}"/>
+      <f:dropdownDescriptorSelector title="${%Global Settings file}" field="globalSettings"  descriptors="${descriptor.globalSettingsProviders}"/>
+    </j:if>
+
+    <!-- MAVEN_OPTS -->
+    <f:entry title="MAVEN_OPTS" description="${%MavenOptsDescr}"
+             help="/plugin/maven-plugin/maven-opts.html">
+      <f:expandableTextbox name="sonar.mavenOpts" value="${instance.mavenOpts}"/>
+    </f:entry>
+    <!-- Maven Properties -->
+    <f:entry title="${%AdditonalProps}" description="${%AdditonalPropsDescr}"
+             help="/plugin/sonar/help-properties.html">
+      <f:expandableTextbox name="sonar.jobAdditionalProperties" value="${instance.getJobAdditionalProperties()}"/>
+    </f:entry>
+    <!-- Build Triggers -->
+    <f:nested>
+      <table width="100%">
+        <f:optionalBlock name="sonar.triggers" title="${%DontUseGlobalTriggers}"
+                         checked="${instance.isUseLocalTriggers()}"
+                         help="/plugin/sonar/help-trigger-global.html">
+          <st:include class="${descriptor.clazz}" page="triggers.jelly" it="${instance.getTriggers()}"/>
+        </f:optionalBlock>
+      </table>
+    </f:nested>
+  </f:advanced>
+
+</j:jelly>

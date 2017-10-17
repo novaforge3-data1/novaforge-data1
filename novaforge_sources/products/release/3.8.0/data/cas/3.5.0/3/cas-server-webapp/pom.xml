@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.novaforge.products.data</groupId>
+		<artifactId>cas</artifactId>
+		<version>3.5.0_3</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<artifactId>cas-server-webapp</artifactId>
+	<packaging>war</packaging>
+	<name>NovaForge(tm) :: Products :: 3.5.0 :: Datas :: CAS :: 3.5.0_3 :: Server WebApp</name>
+	<description>NovaForge(tm) :: Products :: 3.5.0 :: Datas :: CAS :: 3.5.0_3 :: Server WebApp</description>
+	<profiles>
+		<profile>
+			<id>database</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+         <!-- For JDBC handler -->
+			<dependencies>
+				<dependency>
+					<groupId>org.jasig.cas</groupId>
+					<artifactId>cas-server-support-jdbc</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.mariadb.jdbc</groupId>
+					<artifactId>mariadb-java-client</artifactId>
+					<exclusions>
+						<exclusion>
+							<artifactId>junit</artifactId>
+							<groupId>junit</groupId>
+						</exclusion>
+					</exclusions>
+				</dependency>
+			</dependencies>
+			<properties>
+				<authentification.type>database</authentification.type>
+				<rp.build.warclassifier></rp.build.warclassifier>
+				<bean.source><![CDATA[<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"> 
+   <property name="driverClassName"> 
+         <value>org.mariadb.jdbc.Driver</value> 
+   </property> 
+   <property name="url"> 
+      <value>jdbc:mysql://localhost:3306/novaforge?autoReconnect=true</value> 
+   </property> 
+   <property name="username"> 
+         <value>root</value> 
+   </property> 
+   <property name="password"> 
+         <value>root</value> 
+   </property> 
+   </bean>]]></bean.source>
+				<bean.attributes><![CDATA[<bean id="attributeRepository" class="org.jasig.services.persondir.support.jdbc.SingleRowJdbcPersonAttributeDao">
+         <constructor-arg index="0" ref="dataSource" />
+         <constructor-arg index="1" value="SELECT * FROM ACTOR_USER WHERE {0}" />
+         <property name="queryAttributeMapping">
+        <map>
+            <entry key="username" value="login" />
+        </map>
+         </property>
+         <property name="resultAttributeMapping">
+        <map>
+		    <entry key="name" value="name" />
+		    <entry key="firstname" value="firstname" />
+		    <entry key="email" value="email" />
+        </map>
+         </property>
+   </bean>]]></bean.attributes>
+				<allowed.attributes><![CDATA[<property name="allowedAttributes">
+			    <list>
+			      <value>email</value>
+			      <value>name</value>
+			      <value>firstname</value>
+			    </list>              
+			  </property>]]></allowed.attributes>
+				<bean.usersfilter><![CDATA[<bean id="SearchModeSearchDatabaseAuthenticationHandler" class="org.jasig.cas.adaptors.jdbc.SearchModeSearchDatabaseAuthenticationHandler" abstract="false"     lazy-init="default" autowire="default"> 
+               <property name="tableUsers"><value>ACTOR_USER</value></property> 
+               <property name="fieldUser"><value>login</value></property> 
+               <property name="fieldPassword"><value>password</value></property> 
+               <property name="dataSource" ref="dataSource" /><property name="passwordEncoder" ref="SHA1PasswordEncoder" />
+            </bean>]]></bean.usersfilter>
+			</properties>
+		</profile>
+		<profile>
+			<id>ldap</id>
+			<activation>
+				<property>
+					<name>ldap</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+            <!-- For LDAP handler -->
+				<dependency>
+					<groupId>org.jasig.cas</groupId>
+					<artifactId>cas-server-support-ldap</artifactId>
+				</dependency>
+			</dependencies>
+			<properties>
+				<rp.build.warclassifier>ldap</rp.build.warclassifier>
+				<authentification.type>ldap</authentification.type>
+				<bean.source><![CDATA[<bean id="dataSource" class="org.springframework.ldap.core.support.LdapContextSource">
+  <property name="pooled" value="false"/>
+  <property name="url" value="ldap://127.0.0.1" />
+  <property name="userDn" value="admin"/>
+  <property name="password" value="novaforge_1"/>
+  <property name="baseEnvironmentProperties">
+    <map>
+      <entry key="com.sun.jndi.ldap.connect.timeout" value="3000" />
+      <entry key="com.sun.jndi.ldap.read.timeout" value="3000" />
+      <entry key="java.naming.security.authentication" value="simple" />
+    </map>
+  </property>
+</bean>]]></bean.source>
+				<bean.attributes><![CDATA[<bean id="attributeRepository"
+      class="org.jasig.services.persondir.support.StubPersonAttributeDao">
+      <property name="backingMap">
+         <map>
+            <entry key="name" value="displayname" /> 
+            <entry key="email" value="mail" />
+         </map>
+      </property>
+   </bean>]]></bean.attributes>
+				<allowed.attributes><![CDATA[<property name="allowedAttributes">
+			    <list>
+			      <value>email</value>
+			      <value>name</value>
+			    </list>              
+			  </property>]]></allowed.attributes>
+				<bean.usersfilter><![CDATA[<bean class="org.jasig.cas.adaptors.ldap.FastBindLdapAuthenticationHandler"
+                                      p:filter="uid=%u"
+                                      p:contextSource-ref="contextSource" />]]></bean.usersfilter>
+			</properties>
+		</profile>
+	</profiles>
+	<dependencies>
+		<!-- Cas Server Webapp -->
+		<dependency>
+			<groupId>org.jasig.cas</groupId>
+			<artifactId>cas-server-webapp</artifactId>
+			<type>war</type>
+		</dependency>
+      
+		<!-- For Restlet handler -->
+		<dependency>
+			<groupId>org.jasig.cas</groupId>
+			<artifactId>cas-server-integration-restlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet</groupId>
+			<artifactId>org.restlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.noelios.restlet</groupId>
+			<artifactId>com.noelios.restlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.noelios.restlet</groupId>
+			<artifactId>com.noelios.restlet.ext.servlet</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>cas</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<classifier>${rp.build.warclassifier}</classifier>
+					<packagingExcludes> images/ja-sig-logo.gif, images/confirm.gif, images/error.gif, images/info.gif,
+						images/key-point_bl.gif, images/key-point_br.gif, images/key-point_tl.gif,
+						images/key-point_tr.gif,
+						WEB-INF/classes/messages_ar.properties, WEB-INF/classes/messages_ca.properties,
+						WEB-INF/classes/messages_cs.properties, WEB-INF/classes/messages_de.properties,
+						WEB-INF/classes/messages_es.properties, WEB-INF/classes/messages_fa.properties,
+						WEB-INF/classes/messages_hr.properties, WEB-INF/classes/messages_it.properties,
+						WEB-INF/classes/messages_ja.properties, WEB-INF/classes/messages_mk.properties,
+						WEB-INF/classes/messages_nl.properties, WEB-INF/classes/messages_pl.properties,
+						WEB-INF/classes/messages_pt_BR.properties, WEB-INF/classes/messages_pt_PT.properties,
+						WEB-INF/classes/messages_ru.properties, WEB-INF/classes/messages_sl.properties,
+						WEB-INF/classes/messages_sv.properties, WEB-INF/classes/messages_tr.properties,
+						WEB-INF/classes/messages_ur.properties, WEB-INF/classes/messages_zh_CN.properties,
+						WEB-INF/classes/messages_zh_TW.properties
+					</packagingExcludes>
+					<webResources>
+						<resource>
+							<directory>src/main/webapp</directory>
+							<filtering>true</filtering>
+							<includes>
+								<include>**/deployerConfigContext.xml</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

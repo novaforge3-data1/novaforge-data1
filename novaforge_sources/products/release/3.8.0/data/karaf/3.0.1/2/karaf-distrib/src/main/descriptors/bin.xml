@@ -1,0 +1,132 @@
+<!--
+ * Copyright (c) 2011-2015, BULL SAS, NovaForge Version 3 and above.
+ *
+ * This file is free software: you may redistribute and/or 
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, version 3 of the License.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU AGPL version 3 (AGPL-3.0) section 7
+ *
+ * If you modify this Program, or any covered work,
+ * by linking or combining it with libraries listed
+ * in COPYRIGHT file at the top-level directof of this
+ * distribution (or a modified version of that libraries),
+ * containing parts covered by the terms of licenses cited
+ * in the COPYRIGHT file, the licensors of this Program
+ * grant you additional permission to convey the resulting work.
+-->
+<assembly>
+	<id>bin</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<fileSets>
+        <!-- Expanded Karaf Standard Distribution -->
+		<fileSet>
+			<directory>target/dependencies/apache-karaf-${karaf.version}
+			</directory>
+			<outputDirectory>/</outputDirectory>
+			<excludes>
+				<exclude>**/demos/**</exclude>
+				<exclude>bin/**</exclude>
+				<exclude>etc/system.properties</exclude>
+				<exclude>etc/custom.properties</exclude>
+				<exclude>etc/users.properties</exclude>
+				<exclude>etc/jetty.xml</exclude>
+				<exclude>etc/org.apache.karaf.features.cfg</exclude>
+				<exclude>etc/org.ops4j.pax.url.mvn.cfg</exclude>
+				<exclude>LICENSE</exclude>
+				<exclude>NOTICE</exclude>
+				<exclude>README</exclude>
+				<exclude>RELEASE-NOTES</exclude>
+				<exclude>karaf-manual*.html</exclude>
+				<exclude>karaf-manual*.pdf</exclude>
+			</excludes>
+		</fileSet>
+
+        <!-- Copy over bin/* separately to get the correct file mode -->
+		<fileSet>
+			<directory>target/dependencies/apache-karaf-${karaf.version}
+			</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<include>bin/admin</include>
+				<include>bin/karaf</include>
+				<include>bin/client</include>
+				<include>bin/shell</include>
+				<include>bin/setenv</include>
+				<include>bin/start</include>
+				<include>bin/stop</include>
+			</includes>
+			<fileMode>0755</fileMode>
+		</fileSet>
+
+        <!-- Copy configuration files -->
+		<fileSet>
+			<directory>src/main/distribution</directory>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0644</fileMode>
+		</fileSet>
+        <!-- Copy filtered configuration files -->
+		<fileSet>
+			<directory>target/classes/etc</directory>
+			<outputDirectory>/etc</outputDirectory>
+			<includes>
+				<include>org.apache.karaf.features.cfg</include>
+				<include>custom.properties</include>
+				<include>jetty.xml</include>
+			</includes>
+			<fileMode>0644</fileMode>
+		</fileSet>
+        <!-- Copy maven repository -->
+		<fileSet>
+			<directory>target/features-repo</directory>
+			<outputDirectory>/system</outputDirectory>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib/ext</outputDirectory>
+			<useStrictFiltering>true</useStrictFiltering>
+			<includes>
+				<include>org.mariadb.jdbc:mariadb-java-client</include>
+				<include>com.mchange:c3p0</include>
+				<include>com.mchange:mchange-commons-java</include>
+				<include>org.apache.bval:org.apache.bval.bundle</include>
+				<include>org.apache.geronimo.specs:geronimo-validation_1.0_spec</include>
+				<include>commons-beanutils:commons-beanutils</include>
+				<include>commons-logging:commons-logging</include>
+				<include>commons-collections:commons-collections</include>
+				<include>org.apache.commons:commons-lang3</include>
+			</includes>
+			<outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}
+			</outputFileNameMapping>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>lib/endorsed</outputDirectory>
+			<useStrictFiltering>true</useStrictFiltering>
+			<includes>
+				<include>org.apache.geronimo.specs:geronimo-annotation_1.0_spec</include>
+				<include>org.apache.geronimo.specs:geronimo-activation_1.1_spec:jar:novaforge:1.2-2013103</include>
+			</includes>
+			<outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}
+			</outputFileNameMapping>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>lib/</outputDirectory>
+			<useStrictFiltering>true</useStrictFiltering>
+			<includes>
+				<include>org.novaforge.products.data:karaf-branding</include>
+			</includes>
+			<outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}
+			</outputFileNameMapping>
+		</dependencySet>
+	</dependencySets>
+</assembly>

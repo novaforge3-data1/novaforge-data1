@@ -1,0 +1,84 @@
+<!--
+ * Copyright (c) 2011-2015, BULL SAS, NovaForge Version 3 and above.
+ *
+ * This file is free software: you may redistribute and/or 
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, version 3 of the License.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU AGPL version 3 (AGPL-3.0) section 7
+ *
+ * If you modify this Program, or any covered work,
+ * by linking or combining it with libraries listed
+ * in COPYRIGHT file at the top-level directof of this
+ * distribution (or a modified version of that libraries),
+ * containing parts covered by the terms of licenses cited
+ * in the COPYRIGHT file, the licensors of this Program
+ * grant you additional permission to convey the resulting work.
+-->
+<assembly>
+	<id>bin</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<includeBaseDirectory>true</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${tomcat.unzip.dir}/${tomcat.target.dir}</directory>
+			<outputDirectory>/</outputDirectory>
+			<excludes>
+				<exclude>**/webapps/ROOT/**</exclude>
+				<exclude>**/webapps/docs/**</exclude>
+				<exclude>**/webapps/examples/**</exclude>
+				<exclude>**/webapps/host-manager/**</exclude>
+				<exclude>**/webapps/manager/**</exclude>
+				<exclude>logs</exclude>
+			</excludes>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib</outputDirectory>
+			<useStrictFiltering>true</useStrictFiltering>
+			<includes>
+				<include>org.jasig.cas.client:cas-client-core</include>
+				<include>org.jasig.cas.client:cas-client-integration-tomcat-common</include>
+				<include>org.jasig.cas.client:cas-client-integration-tomcat-v7</include>
+				<include>commons-codec:commons-codec</include>
+				<include>commons-httpclient:commons-httpclient</include>
+				<include>commons-logging:commons-logging</include>
+				<include>xml-security:xmlsec</include>
+				<include>mysql:mysql-connector-java</include>
+			</includes>
+			<outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}
+			</outputFileNameMapping>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>webapps/</outputDirectory>
+			<includes>
+				<include>${project.groupId}:alfresco-war-aggregator</include>
+			</includes>
+			<outputFileNameMapping>alfresco.${artifact.extension}</outputFileNameMapping>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>webapps/</outputDirectory>
+			<includes>
+				<include>${project.groupId}:share-war-aggregator</include>
+			</includes>
+			<outputFileNameMapping>share.${artifact.extension}</outputFileNameMapping>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>webapps/</outputDirectory>
+			<includes>
+				<include>${project.groupId}:solr-customization:war</include>
+			</includes>
+			<outputFileNameMapping>solr.${artifact.extension}</outputFileNameMapping>
+		</dependencySet>			
+	</dependencySets>
+</assembly>

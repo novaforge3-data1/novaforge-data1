@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+ * Copyright ( c ) 2011-2014, BULL SAS, NovaForge Version 3 and above.
+ *
+ * This file is free software: you may redistribute and/or 
+ * modify it under the terms of the GNU Alffero General Public License
+ * as published by the Free Software Foundation, version 3 of the License.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Alffero General Public License for more details.
+ * You should have received a copy of the GNU Alffero General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU AGPL version 3 (AGPL-3.0) section 7
+ *
+ * If you modify this Program, or any covered work,
+ * by linking or combining it with libraries listed
+ * in COPYRIGHT file at the top-level directof of this
+ * distribution (or a modified version of that libraries),
+ * containing parts covered by the terms of licenses cited
+ * in the COPYRIGHT file, the licensors of this Program
+ * grant you additional permission to convey the resulting work.
+-->
+
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+   <bean id="daoAuthenticationProvider" class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
+      <property name="authenticationDao">
+         <ref bean="authenticationDao" />
+      </property>
+      <property name="saltSource">
+         <ref bean="saltSource" />
+      </property>
+      <property name="passwordEncoder">
+         <ref bean="passwordEncoder" />
+      </property>
+   </bean>
+
+   <!-- The DAO also acts as a salt provider.                              -->
+
+   <alias alias="saltSource" name="authenticationDao" />
+
+   <bean id="authenticationManager" class="net.sf.acegisecurity.providers.ProviderManager">
+      <property name="providers">
+         <list>
+            <ref bean="authenticatedAuthenticationPassthroughProvider" />
+            <ref bean="daoAuthenticationProvider" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="authenticationDao" class="org.alfresco.repo.security.authentication.RepositoryAuthenticationDao">
+      <property name="authorityService">
+         <ref bean="authorityService" />
+      </property>      
+      <property name="nodeService">
+         <ref bean="nodeService" />
+      </property>
+      <property name="tenantService">
+         <ref bean="tenantService" />
+      </property>
+      <property name="namespaceService">
+         <ref bean="namespaceService" />
+      </property>
+      <property name="passwordEncoder">
+         <ref bean="passwordEncoder" />
+      </property>
+      <property name="policyComponent">
+         <ref bean="policyComponent" />
+      </property>
+      <property name="transactionService">
+         <ref bean="transactionService" />
+      </property>
+      <property name="authenticationCache">
+         <ref bean="authenticationCache" />
+      </property>
+   </bean>
+
+    <bean id="authenticationComponentBase" abstract="true">
+       <property name="authenticationContext">
+            <ref bean="authenticationContext"/>
+        </property>
+       <property name="userRegistrySynchronizer">
+            <ref bean="userRegistrySynchronizer"/>
+        </property>
+    </bean>
+  
+
+	<!-- Initialisation des webscripts-->
+	<bean id="forge-webscript" abstract="true" parent="webscript">
+		<property name="authenticationService" ref="AuthenticationService" />
+		<property name="searchService" ref="SearchService" />
+		<property name="serviceRegistry" ref="ServiceRegistry" />
+		<property name="repositoryHelper" ref="repositoryHelper" />
+	</bean>
+	
+	<!-- webscript permettant de récupérer les documents
+	l'id du bean doit suivre certaine regle
+	As before, the naming convention of the Spring bean declaration is important.
+
+    * The prefix webscript is picked up by the Web Script engine. In this way, it knows that the bean you are declaring is a web script implementation.
+    * The ending get is picked up by the Web Script engine. It tells the Web Script engine which HTTP method to handle. In this case, an HTTP GET.
+    * The rest is then assumed to be the package and name of the Web Script.   
+	-->
+	<bean id="webscript.org.novaforge.forge.createUser.post" class="org.novaforge.forge.plugin.alfresco.webscripts.CreateUser" parent="forge-webscript">
+	</bean>
+	
+	<bean id="webscript.org.novaforge.forge.createUser.get" class="org.novaforge.forge.plugin.alfresco.webscripts.CreateUser" parent="forge-webscript">
+	</bean>
+	
+	<bean id="webscript.org.novaforge.forge.createProject.get" class="org.novaforge.forge.plugin.alfresco.webscripts.CreateProject" parent="forge-webscript">
+	</bean>
+		
+	<bean id="webscript.org.novaforge.forge.getRoles.get" class="org.novaforge.forge.plugin.alfresco.webscripts.GetRoles" parent="forge-webscript">
+	</bean>
+  
+   	<bean id="webscript.org.novaforge.forge.getSiteRoles.get" class="org.novaforge.forge.plugin.alfresco.webscripts.GetSiteRoles" parent="forge-webscript">
+   	</bean>
+ 
+   	<bean id="webscript.org.novaforge.forge.inviteUser.get" class="org.novaforge.forge.plugin.alfresco.webscripts.InviteUser" parent="forge-webscript">
+   	</bean>
+   
+   	<bean id="webscript.org.novaforge.forge.disinviteUser.get" class="org.novaforge.forge.plugin.alfresco.webscripts.DisinviteUser" parent="forge-webscript">
+   	</bean>
+  
+   	<bean id="webscript.org.novaforge.forge.deleteProject.get" class="org.novaforge.forge.plugin.alfresco.webscripts.DeleteProject" parent="forge-webscript">
+   	</bean>
+   
+   	<bean id="webscript.org.novaforge.forge.deleteUser.get" class="org.novaforge.forge.plugin.alfresco.webscripts.DeleteUser" parent="forge-webscript">
+   	</bean>
+   
+   	<bean id="webscript.org.novaforge.forge.updateProject.get" class="org.novaforge.forge.plugin.alfresco.webscripts.UpdateProject" parent="forge-webscript">
+   	</bean>
+   
+   	<bean id="webscript.org.novaforge.forge.updateUser.get" class="org.novaforge.forge.plugin.alfresco.webscripts.UpdateUser" parent="forge-webscript">
+   	</bean>
+      
+</beans>

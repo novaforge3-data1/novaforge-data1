@@ -1,0 +1,101 @@
+<!--
+ * Copyright (c) 2011-2015, BULL SAS, NovaForge Version 3 and above.
+ *
+ * This file is free software: you may redistribute and/or 
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, version 3 of the License.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU AGPL version 3 (AGPL-3.0) section 7
+ *
+ * If you modify this Program, or any covered work,
+ * by linking or combining it with libraries listed
+ * in COPYRIGHT file at the top-level directof of this
+ * distribution (or a modified version of that libraries),
+ * containing parts covered by the terms of licenses cited
+ * in the COPYRIGHT file, the licensors of this Program
+ * grant you additional permission to convey the resulting work.
+--> 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.novaforge.products.data</groupId>
+		<artifactId>alfresco</artifactId>
+		<version>5.0.d_0</version>
+	</parent>
+	
+	<artifactId>alfresco-war-aggregator</artifactId>
+    <packaging>war</packaging>
+	<name>NovaForge(tm) :: Products :: 3.8.0 :: Datas :: Alfresco :: 5.0.d_0 :: Alfresco WAR Aggregator</name>
+	<description>NovaForge(tm) :: Products :: 3.8.0 :: Datas :: Alfresco :: 5.0.d_0 ::  Alfresco WAR Aggregator</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${alfresco.groupId}</groupId>
+            <artifactId>alfresco</artifactId>
+            <type>war</type>
+            <version>${alfresco.version}</version>
+        </dependency>
+        <!-- Demonstrating the dependency / installation of the repo AMP developed in the 'repo-amp' module -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>alfresco-amp</artifactId>
+            <version>${project.version}</version>
+            <type>amp</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>alfresco-remote-api</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+        </dependency>        
+    </dependencies>
+
+    <build>
+        <finalName>alfresco</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <!--  Here is can control the order of overlay of your (WAR, AMP, etc.) dependencies
+                        | NOTE: At least one WAR dependency must be uncompressed first
+                        | NOTE: In order to have a dependency effectively added to the WAR you need to 
+                        | explicitly mention it in the overlay section.
+                        | NOTE: First-win resource strategy is used by the WAR plugin
+                         -->
+                    <overlays>
+                        <!-- Current project customizations. This is normally empty, since customizations come from the AMPs -->
+                        <overlay/>
+                        <!-- The Alfresco WAR -->
+                        <overlay>
+                            <groupId>${alfresco.groupId}</groupId>
+                            <artifactId>alfresco</artifactId>
+                            <type>war</type>
+                            <!-- To allow inclusion of META-INF -->
+                            <excludes/>
+                        </overlay>
+                        <!-- Add / sort your AMPs here -->
+                        <overlay>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>alfresco-amp</artifactId>
+                            <type>amp</type>
+                        </overlay>     
+                        <overlay>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>alfresco-remote-api</artifactId>
+                            <type>jar</type>
+                        </overlay> 
+                    </overlays>
+                    <packagingExcludes>WEB-INF/lib/alfresco-remote-api-5.0.d.jar</packagingExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

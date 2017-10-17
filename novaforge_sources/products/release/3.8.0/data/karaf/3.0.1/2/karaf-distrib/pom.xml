@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright (c) 2011-2015, BULL SAS, NovaForge Version 3 and above.
+ *
+ * This file is free software: you may redistribute and/or 
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, version 3 of the License.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU AGPL version 3 (AGPL-3.0) section 7
+ *
+ * If you modify this Program, or any covered work,
+ * by linking or combining it with libraries listed
+ * in COPYRIGHT file at the top-level directof of this
+ * distribution (or a modified version of that libraries),
+ * containing parts covered by the terms of licenses cited
+ * in the COPYRIGHT file, the licensors of this Program
+ * grant you additional permission to convey the resulting work.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.novaforge.products.data</groupId>
+		<artifactId>karaf</artifactId>
+		<version>3.0.1_2</version>
+	</parent>
+	<artifactId>karaf-distrib</artifactId>
+	<packaging>pom</packaging>
+	<name>NovaForge(tm) :: Products :: 3.5.0 :: Datas :: Karaf :: 3.0.1_2 :: Distrib</name>
+	<description>NovaForge(tm) :: Products :: 3.5.0 :: Datas :: Karaf :: 3.0.1_2 :: Distrib</description>
+	<properties>
+		<dependencies.dir>${project.build.directory}/dependencies</dependencies.dir>
+		<karaf.dir>${dependencies.dir}/apache-karaf-${karaf.version}</karaf.dir>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.karaf</groupId>
+			<artifactId>apache-karaf</artifactId>
+			<type>tar.gz</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>standard</artifactId>
+			<type>xml</type>
+			<classifier>features</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>enterprise</artifactId>
+			<type>xml</type>
+			<classifier>features</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.novaforge.products.data</groupId>
+			<artifactId>karaf-branding</artifactId>
+			<version>${karaf.data.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>mchange-commons-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.bval</groupId>
+			<artifactId>org.apache.bval.bundle</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-validation_1.0_spec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-annotation_1.0_spec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-activation_1.1_spec</artifactId>
+			<classifier>novaforge</classifier>
+		</dependency>
+	</dependencies>
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/filtered-resources
+				</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>filter</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.karaf.tooling</groupId>
+				<artifactId>karaf-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>features-add-to-repository</id>
+						<goals>
+							<goal>features-add-to-repository</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features
+								</descriptor>
+								<descriptor>mvn:org.apache.karaf.features/enterprise/${karaf.version}/xml/features
+								</descriptor>
+							</descriptors>
+							<features>
+								<feature>config</feature>
+								<feature>standard</feature>			
+								<feature>region</feature>			
+								<feature>package</feature>			
+								<feature>ssh</feature>
+								<feature>management</feature>
+								<feature>wrapper</feature>
+								<feature>jndi</feature>
+								<feature>jpa</feature>
+								<feature>transaction</feature>
+								<feature>eventadmin</feature>
+								<feature>war</feature>
+								<feature>http-whiteboard</feature>
+								<feature>blueprint-web</feature>
+								<feature>webconsole</feature>
+							</features>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+            <!-- Uncompress the standard Karaf distribution -->
+						<id>unpack</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.apache.karaf</groupId>
+									<artifactId>apache-karaf</artifactId>
+									<type>tar.gz</type>
+									<outputDirectory>${dependencies.dir}</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bin</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/descriptors/bin.xml</descriptor>
+							</descriptors>
+							<appendAssemblyId>false</appendAssemblyId>
+							<tarLongFileMode>gnu</tarLongFileMode>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
